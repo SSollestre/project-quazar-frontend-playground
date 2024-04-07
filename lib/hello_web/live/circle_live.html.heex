@@ -1,8 +1,8 @@
 
 <div style="position: relative; width: 100vw; height: 100vh;">
     <div>
-        <%= @circle_y %>
+        <%= @circle_y.y %>
     </div>
 
-    <img id="circle" phx-hook="MoveCircle" src={~p"/images/side-eye.jpg"} width="100" height="100" style={"position: absolute; top: #{@circle_y}px; left: 50%; transform: translate(-50%,-50%);"}/>
+    <img id="circle" phx-hook="MoveCircle" src={~p"/images/side-eye.jpg"} width="100" height="100" style={"position: absolute; top: #{@circle_y.y}px; left: 50%; transform: translate(-50%,-50%);"}/>
 </div>
