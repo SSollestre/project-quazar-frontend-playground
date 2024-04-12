@@ -46,7 +46,7 @@ Hooks.MoveHook = {
     console.log("circle mounted", myElement);
     let pressedKeys = new Set(); // Set to track pressed keys
 
-    myElement.addEventListener("keydown", (e) => {
+    window.addEventListener("keydown", (e) => {
       if (!pressedKeys.has(e.key)) {
         console.log("Oooh he movin");
         pressedKeys.add(e.key); // Add pressed key to the set
@@ -54,11 +54,16 @@ Hooks.MoveHook = {
       }
     });
 
-    myElement.addEventListener("keyup", (e) => {
+    window.addEventListener("keyup", (e) => {
       if (pressedKeys.has(e.key)) {
         pressedKeys.delete(e.key); // Remove released key from the set
         this.pushEvent("stop_move", { key: e.key });
       }
+    });
+
+    // Add event listener for the "click" event
+    window.addEventListener("click", () => {
+      this.pushEvent("shoot", {});
     });
   },
 };

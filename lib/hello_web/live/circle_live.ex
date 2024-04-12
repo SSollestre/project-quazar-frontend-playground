@@ -31,4 +31,9 @@ defmodule HelloWeb.CircleLive do
     IO.inspect("#{key} released")
     {:noreply, socket}
   end
+
+  def handle_event("shoot", _value, socket) do
+    IO.inspect("Pew")
+    {:noreply, socket}
+  end
 end
