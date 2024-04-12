@@ -5,11 +5,15 @@ defmodule HelloWeb.CircleLive do
     initial_x = 100
     initial_y = 100
     json_pos = %{x: initial_x, y: initial_y}
+    player_status = %{health: 100, isAlive: true}
+    json_pos = Map.merge(json_pos, player_status)
+
     {:ok, assign(socket, :circle_pos, json_pos)}
   end
 
   def handle_event("start_move", %{"key" => key}, socket) do
     IO.inspect("#{key} pressed")
+    IO.inspect(socket)
 
     new_pos =
       case key do
@@ -23,6 +27,9 @@ defmodule HelloWeb.CircleLive do
         "d" -> %{x: socket.assigns.circle_pos.x + 10, y: socket.assigns.circle_pos.y}
         _ -> socket.assigns.circle_pos
       end
+
+    # Merge the extra values back into the new position map
+    new_pos = Map.merge(new_pos, Map.drop(socket.assigns.circle_pos, [:x, :y]))
 
     {:noreply, assign(socket, :circle_pos, new_pos)}
   end
