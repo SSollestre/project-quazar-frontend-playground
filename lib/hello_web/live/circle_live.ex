@@ -7,13 +7,19 @@ defmodule HelloWeb.CircleLive do
     json_pos = %{x: initial_x, y: initial_y}
     player_status = %{health: 100, isAlive: true}
     json_pos = Map.merge(json_pos, player_status)
+    game_board = fetch_game_board_data()
 
-    {:ok, assign(socket, :circle_pos, json_pos)}
+    socket =
+      socket
+      |> assign(:circle_pos, json_pos)
+      |> assign(:game_board, game_board)
+
+    {:ok, socket}
   end
 
   def handle_event("start_move", %{"key" => key}, socket) do
     IO.inspect("#{key} pressed")
-    IO.inspect(socket)
+    IO.inspect(socket.assigns.circle_pos)
 
     new_pos =
       case key do
@@ -42,5 +48,24 @@ defmodule HelloWeb.CircleLive do
   def handle_event("shoot", _value, socket) do
     IO.inspect("Pew")
     {:noreply, socket}
+  end
+
+  # Helper function to fetch game board data (replace with your implementation)
+  defp fetch_game_board_data() do
+    # Fetch game board data from JSON or a struct
+    # Example: game_board_data = MyApp.GameBoard.fetch_data()
+    # For demo purposes, return a static example
+    [
+      ["X", "O", "X", "O", "X", "O", "X", "O", "X", "O"],
+      ["O", "X", "O", "X", "O", "X", "O", "X", "O", "X"],
+      ["X", "O", "X", "O", "X", "O", "X", "O", "X", "O"],
+      ["O", "X", "O", "X", "O", "X", "O", "X", "O", "X"],
+      ["X", "O", "X", "O", "X", "O", "X", "O", "X", "O"],
+      ["O", "X", "O", "X", "O", "X", "O", "X", "O", "X"],
+      ["X", "O", "X", "O", "X", "O", "X", "O", "X", "O"],
+      ["O", "X", "O", "X", "O", "X", "O", "X", "O", "X"],
+      ["X", "O", "X", "O", "X", "O", "X", "O", "X", "O"],
+      ["O", "X", "O", "X", "O", "X", "O", "X", "O", "X"]
+    ]
   end
 end

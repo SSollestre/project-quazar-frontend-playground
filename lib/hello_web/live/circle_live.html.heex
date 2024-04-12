@@ -1,10 +1,23 @@
 
-<div style="position: relative; width: 100vw; height: 100vh;">
-    <div>
-        <%= @circle_pos.y %>
-    </div>
-
-    <img id="circle" phx-hook="MoveHook" src={~p"/images/side-eye.jpg"} width="100" height="100" tabindex="0"
-        style={"position: absolute; top: #{@circle_pos.y}px; left: #{@circle_pos.x}px; transform:
-        translate(-50%,-50%);"} />
+<div>
+    <%= Phoenix.HTML.raw(Jason.encode!(@circle_pos)) %>
 </div>
+<canvas id="circleCanvas" phx-hook="MoveHook" width="800" height="800" data-pos={"#{Jason.encode!(@circle_pos)}"}} data-board={"#{Jason.encode!(@game_board)}"}></canvas>
+
+// <script>
+//     let assignsThings = JSON.parse(`<%= Phoenix.HTML.raw(Jason.encode!(assigns.circle_pos)) %>`);
+//     console.log(assignsThings.y)
+//     // Get the canvas element
+//     let canvas = document.getElementById("circleCanvas");
+//     // Get the 2D rendering context
+//     let ctx = canvas.getContext("2d");
+
+//     // Create a new image object
+//     let image = new Image();
+//     image.src = "/images/side-eye.jpg"; // Adjust the path to your image
+
+//     // Draw the image onto the canvas when it's loaded
+//     image.onload = function () {
+//         ctx.drawImage(image, assignsThings.y, assignsThings.x, 130, 100);
+//     };
+// </script>

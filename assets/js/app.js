@@ -36,21 +36,119 @@ Hooks.LogKey = {
 
 Hooks.MoveHook = {
   mounted() {
-    let myElement = document.getElementById("circle");
-    myElement.setAttribute("tabindex", "0");
-    myElement.focus();
-    myElement.addEventListener("blur", function () {
-      myElement.focus();
-    });
-    console.log(myElement.tabIndex);
-    console.log("circle mounted", myElement);
+    console.log("Movement mounted");
     let pressedKeys = new Set(); // Set to track pressed keys
+
+    let canvas = document.getElementById("circleCanvas");
+    let myData = JSON.parse(canvas.getAttribute("data-pos"));
+    console.log("My data", myData);
+    // Start
+    let ctx = canvas.getContext("2d");
+
+    // Use Phoenix.HTML.raw to safely inject the game_board into JavaScript
+    let game_board = JSON.parse(canvas.getAttribute("data-board"));
+
+    let cellSize = 50; // Adjust this value as needed
+    let rows = game_board.length;
+    let cols = game_board[0].length;
+
+    // Draw the game board
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        let x = col * cellSize;
+        let y = row * cellSize;
+
+        ctx.fillStyle = "#FFFFFF"; // Set the background color
+        ctx.fillRect(x, y, cellSize, cellSize); // Draw the cell background
+
+        ctx.strokeStyle = "#000000"; // Set the border color
+        ctx.strokeRect(x, y, cellSize, cellSize); // Draw the cell border
+
+        let cellValue = " ";
+        ctx.fillStyle = "#000000"; // Set the text color
+        // Adjust text alignment and baseline for better centering
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(cellValue, x + cellSize / 2, y + cellSize / 2); // Draw the cell value
+      }
+    }
+
+    // Draw the grid lines
+    ctx.strokeStyle = "#000000"; // Set the color of the grid lines
+    for (let row = 0; row <= rows; row++) {
+      ctx.beginPath();
+      ctx.moveTo(0, row * cellSize);
+      ctx.lineTo(cols * cellSize, row * cellSize);
+      ctx.stroke();
+    }
+    for (let col = 0; col <= cols; col++) {
+      ctx.beginPath();
+      ctx.moveTo(col * cellSize, 0);
+      ctx.lineTo(col * cellSize, rows * cellSize);
+      ctx.stroke();
+    }
+
+    // End
+    // Get the 2D rendering context
+
+    // Create a new image object
+    let image = new Image();
+    image.src = "/images/side-eye.jpg"; // Adjust the path to your image
+
+    // Draw the image onto the canvas when it's loaded
+    image.onload = function () {
+      ctx.drawImage(image, myData.x, myData.y, 130, 100);
+    };
 
     window.addEventListener("keydown", (e) => {
       if (!pressedKeys.has(e.key)) {
-        console.log("Oooh he movin");
         pressedKeys.add(e.key); // Add pressed key to the set
-        this.pushEvent("start_move", { key: e.key });
+        this.pushEvent("start_move", { key: e.key }, (reply) => {
+          console.log("reply", reply);
+          let canvas = document.getElementById("circleCanvas");
+          let myData = JSON.parse(canvas.getAttribute("data-pos"));
+          console.log("My data", myData);
+
+          // Clear the canvas
+          // Draw the game board
+          for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+              let x = col * cellSize;
+              let y = row * cellSize;
+
+              ctx.fillStyle = "#FFFFFF"; // Set the background color
+              ctx.fillRect(x, y, cellSize, cellSize); // Draw the cell background
+
+              ctx.strokeStyle = "#000000"; // Set the border color
+              ctx.strokeRect(x, y, cellSize, cellSize); // Draw the cell border
+
+              let cellValue = " ";
+              ctx.fillStyle = "#000000"; // Set the text color
+              // Adjust text alignment and baseline for better centering
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.fillText(cellValue, x + cellSize / 2, y + cellSize / 2); // Draw the cell value
+            }
+          }
+
+          // Draw the grid lines
+          ctx.strokeStyle = "#000000"; // Set the color of the grid lines
+          for (let row = 0; row <= rows; row++) {
+            ctx.beginPath();
+            ctx.moveTo(0, row * cellSize);
+            ctx.lineTo(cols * cellSize, row * cellSize);
+            ctx.stroke();
+          }
+          for (let col = 0; col <= cols; col++) {
+            ctx.beginPath();
+            ctx.moveTo(col * cellSize, 0);
+            ctx.lineTo(col * cellSize, rows * cellSize);
+            ctx.stroke();
+          }
+
+          // Draw the image at the desired position and size
+          ctx.drawImage(image, myData.x, myData.y, 130, 100);
+        });
       }
     });
 
@@ -67,6 +165,10 @@ Hooks.MoveHook = {
     });
   },
 };
+
+window.addEventListener("phx:remove-el", (e) =>
+  console.log("Remove", e.detail.id)
+);
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
