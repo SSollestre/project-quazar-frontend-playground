@@ -3,3 +3,7 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+/* Remove focus outline for all focusable elements */
+*:focus {
+    outline: none;
+}

@@ -34,14 +34,30 @@ Hooks.LogKey = {
   },
 };
 
-Hooks.MoveCircle = {
+Hooks.MoveHook = {
   mounted() {
-    console.log("circle mounted");
-    window.addEventListener("keydown", (e) => {
-      console.log(e);
-      if (e.key === "w") {
+    let myElement = document.getElementById("circle");
+    myElement.setAttribute("tabindex", "0");
+    myElement.focus();
+    myElement.addEventListener("blur", function () {
+      myElement.focus();
+    });
+    console.log(myElement.tabIndex);
+    console.log("circle mounted", myElement);
+    let pressedKeys = new Set(); // Set to track pressed keys
+
+    myElement.addEventListener("keydown", (e) => {
+      if (!pressedKeys.has(e.key)) {
         console.log("Oooh he movin");
-        this.pushEvent("move_up", {});
+        pressedKeys.add(e.key); // Add pressed key to the set
+        this.pushEvent("start_move", { key: e.key });
+      }
+    });
+
+    myElement.addEventListener("keyup", (e) => {
+      if (pressedKeys.has(e.key)) {
+        pressedKeys.delete(e.key); // Remove released key from the set
+        this.pushEvent("stop_move", { key: e.key });
       }
     });
   },
