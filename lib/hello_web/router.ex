@@ -25,7 +25,7 @@ defmodule HelloWeb.Router do
     live("/thermostat", ThermostatLive)
     live("/circle", CircleLive)
     live("/game_board", GameBoardLive)
-    live("/chat", ChatLive)
+    live("/chat/:name", ChatLive)
   end
 
   scope "/", HelloWeb do

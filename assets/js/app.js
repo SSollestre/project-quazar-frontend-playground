@@ -169,23 +169,16 @@ Hooks.MoveHook = {
 
 Hooks.ChatHook = {
   mounted() {
-    let channel = socket.channel("room:lobby", {});
+    console.log("Chat mounted");
+    const currentUrl = window.location.href;
+    const url = new URL(currentUrl);
+    const pathname = url.pathname;
+    const parts = pathname.split("/");
+    const name = parts[parts.length - 1];
+    let pressedKeys = new Set(); // Set to track pressed keys
 
-    let chatInput = document.querySelector("#chat-input");
-    let messagesContainer = document.querySelector("#messages");
-
-    chatInput.addEventListener("keypress", (event) => {
-      if (event.key === "Enter") {
-        channel.push("new_msg", { body: chatInput.value });
-        chatInput.value = "";
-      }
-    });
-
-    channel.on("new_msg", (payload) => {
-      let messageItem = document.createElement("p");
-      messageItem.innerText = `[${Date()}] ${payload.body}`;
-      messagesContainer.appendChild(messageItem);
-    });
+    this.pushEvent("greet", { channelSocket: socket });
+    let channel = socket.channel("room:lobby", { name: name });
 
     channel
       .join()
@@ -195,8 +188,58 @@ Hooks.ChatHook = {
       .receive("error", (resp) => {
         console.log("Unable to join", resp);
       });
+
+    channel.push("mounted", {}).receive("ok", (resp) => {
+      console.log("Reply from server:", resp);
+    });
+
+    // Display "Game State"
+    let messagesContainer = document.querySelector("#messages");
+
+    window.addEventListener("keydown", (e) => {
+      if (!pressedKeys.has(e.key)) {
+        pressedKeys.add(e.key); // Add pressed key to the set
+        channel.push("keydown", { key: e.key });
+      }
+    });
+
+    // Attempts to promote this client to be the broadcast owner
+    function sendPromoteMessage() {
+      console.log("Promoting...");
+      channel.push("promote", {}).receive("ok", (resp) => {
+        console.log("Reply from server:", resp);
+      });
+    }
+
+    // Attempt to promote every second
+    setInterval(sendPromoteMessage, 1000);
+
+    // Key release listener
+    window.addEventListener("keyup", (e) => {
+      if (pressedKeys.has(e.key)) {
+        pressedKeys.delete(e.key); // Remove released key from the set
+        channel.push("keyup", { key: e.key });
+      }
+    });
+
+    // Listens to channel
+    channel.on("user_state", (payload) => {
+      messagesContainer.innerHTML = "";
+      let messageItem = document.createElement("p");
+      console.log(payload);
+      messageItem.innerText = `Frame: ${payload.count}, Data: ${JSON.stringify(
+        payload.users
+      )}`;
+      messagesContainer.appendChild(messageItem);
+    });
+
+    // Listens to channel
+    channel.on("broadcast", () => {
+      console.log("Interval broadcast detected");
+    });
   },
 };
+
 window.addEventListener("phx:remove-el", (e) =>
   console.log("Remove", e.detail.id)
 );
