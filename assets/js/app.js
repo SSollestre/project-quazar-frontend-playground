@@ -1,6 +1,7 @@
 // If you want to use Phoenix channels, run `mix help phx.gen.channel`
 // to get started and then uncomment the line below.
-// import "./user_socket.js"
+import "./user_socket.js";
+import socket from "./user_socket.js";
 
 // You can include dependencies in two ways.
 //
@@ -166,6 +167,36 @@ Hooks.MoveHook = {
   },
 };
 
+Hooks.ChatHook = {
+  mounted() {
+    let channel = socket.channel("room:lobby", {});
+
+    let chatInput = document.querySelector("#chat-input");
+    let messagesContainer = document.querySelector("#messages");
+
+    chatInput.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") {
+        channel.push("new_msg", { body: chatInput.value });
+        chatInput.value = "";
+      }
+    });
+
+    channel.on("new_msg", (payload) => {
+      let messageItem = document.createElement("p");
+      messageItem.innerText = `[${Date()}] ${payload.body}`;
+      messagesContainer.appendChild(messageItem);
+    });
+
+    channel
+      .join()
+      .receive("ok", (resp) => {
+        console.log("Joined successfully", resp);
+      })
+      .receive("error", (resp) => {
+        console.log("Unable to join", resp);
+      });
+  },
+};
 window.addEventListener("phx:remove-el", (e) =>
   console.log("Remove", e.detail.id)
 );
