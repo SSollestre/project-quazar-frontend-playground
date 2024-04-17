@@ -12,7 +12,7 @@ config :hello,
 
 # Configures the endpoint
 config :hello, HelloWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: System.get_env("RENDER_EXTERNAL_HOSTNAME") || "localhost", port: 80],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: HelloWeb.ErrorHTML, json: HelloWeb.ErrorJSON],
