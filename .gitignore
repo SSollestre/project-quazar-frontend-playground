@@ -35,3 +35,5 @@ hello-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# mix deps.get --only prod && mix phx.gen.release && mix release
+# _build/dev/rel/hello/bin/server

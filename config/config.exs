@@ -19,7 +19,8 @@ config :hello, HelloWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Hello.PubSub,
-  live_view: [signing_salt: "w0fbC+O6"]
+  live_view: [signing_salt: "w0fbC+O6"],
+  server: true
 
 # Configures the mailer
 #
